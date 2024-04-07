@@ -69,6 +69,8 @@ namespace
 
   map(0xdfc0, 0xdfc0).rw("tms9928a", FUNC(tms9928a_device::vram_read), FUNC(tms9928a_device::vram_write));         /*VDP data*/
   map(0xdfc1, 0xdfc1).rw("tms9928a", FUNC(tms9928a_device::register_read), FUNC(tms9928a_device::register_write)); /*VDP status*/
+
+  map(0x8000, 0xffff).rom();
 }
 
 INPUT_PORTS_START(gtvip_inputs)
@@ -77,8 +79,7 @@ INPUT_PORTS_END
 
 ROM_START(gtvip)
 ROM_REGION(0x10000, "maincpu", 0)
-ROM_LOAD("ming0.bin", 0x0000, 0x75, CRC(eaff23ef) SHA1(81407c555331cc62c13e1f90fa27141b4d409b6b))
-// ROM_LOAD("textdemo.bin", 0x0000, 0x75, CRC(24412fd2) SHA1(ebfde06e02b485279eec6d1befd2efaf0344ae52))
+ROM_LOAD("textdemo.bin", 0x8000, 0x8000, CRC(4cf363dc) SHA1(bed707ec2ebb3e6cddfc6db58d78e436af05961a))
 ROM_END
 
 } // namespace
