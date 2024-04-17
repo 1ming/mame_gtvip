@@ -38,12 +38,21 @@ namespace
     G65816(config, m_maincpu, XTAL(8'000'000));
     m_maincpu->set_addrmap(AS_PROGRAM, &gtvip_state::main_memmap);
 
+    // TODO: figure out how to set up sound chip
     YM2149(config, m_ymsnd, XTAL(4'000'000));
     m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
     // m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
     // m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
     // m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
+    // example of how atari does it
+    // YM2149(config, m_ymsnd, Y2/16);
+    // m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
+    // m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
+    // m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
+    // m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
+
+    // display chip
     // referenced colecovision which uses TMS9928A: src/mame/coleco/coleco.cpp
     // 10.738633MHz clock frequency and 16K vram
     // not sure about the SCREEN part but just copied it over
@@ -78,12 +87,19 @@ namespace
     // DF11: Register Select for YM2149 soundchip #1
     // DF12: Data Send for YM2149 soundchip #2
     // DF13: Register Select for YM2149 soundchip #2
+    // should use DF14 and 15 instead of 12 and 13 for now to match the soundtest binary
+
+    // example of how atari maps their sound chip
+    // map(0xff8800, 0xff8800).after_delay(NAME([](offs_t) { return 1; })).rw(m_ymsnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w)).mirror(0xfc);
+    // map(0xff8802, 0xff8802).after_delay(NAME([](offs_t) { return 1; })).rw(m_ymsnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::data_w)).mirror(0xfc);
+    // map(0xff8800, 0xff8800).rw(m_ymsnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
+    // map(0xff8802, 0xff8802).w(m_ymsnd, FUNC(ay8910_device::data_w));
+
 
     // controllers
     // DF00-DF03: Controller 1 through 4 inputs (aliased to DF04-DF07)
     // When Controller Select Pin output (P51, pin 4, J4-P5x connector) is 1: [C B C B Right Left Down Up]
     // When Controller Select Pin output (P51, pin 4, J4-P5x connector) is 0: [Start A Start A 0 0 Down Up]
-    
 
   }
 
@@ -93,7 +109,21 @@ namespace
 
   ROM_START(gtvip)
   ROM_REGION(0x10000, "maincpu", 0)
+
+  // HACK: for now, uncomment the ROM_LOAD line for the corresponding program to run
+  // need to figure out a better way to handle roms
+  // currently only the textdemo works
+
+  // display test
   ROM_LOAD("textdemo.bin", 0x8000, 0x8000, CRC(4cf363dc) SHA1(bed707ec2ebb3e6cddfc6db58d78e436af05961a))
+
+  // sound test
+  // ROM_LOAD("soundtest.bin", 0x8000, 0x8000, CRC(f642b60b) SHA1(959e39441e56fb1d2a6e6534197f14c4afdbda0f))
+
+  // monitor rom test
+  // ROM_LOAD("monitor.bin", 0xE000, 0x2000, CRC(9575d641) SHA1(56ca218c0ed3d8fd631ee03690c0815b1441d0d4))
+    
+
   ROM_END
 
 } // namespace
