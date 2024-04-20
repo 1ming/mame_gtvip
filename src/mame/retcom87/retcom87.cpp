@@ -4,6 +4,8 @@
 #include "sound/ay8910.h"
 #include "video/tms9928a.h"
 
+#include "machine/rescap.h"  // for set_resistors_load
+
 namespace
 {
 
@@ -48,7 +50,7 @@ namespace
     // example of how atari does it
     // YM2149(config, m_ymsnd, Y2/16);
     // m_ymsnd->set_flags(AY8910_SINGLE_OUTPUT);
-    // m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
+    m_ymsnd->set_resistors_load(RES_K(1), 0, 0);
     // m_ymsnd->port_a_write_callback().set(FUNC(st_state::psg_pa_w));
     // m_ymsnd->port_b_write_callback().set("cent_data_out", FUNC(output_latch_device::write));
 
@@ -95,12 +97,16 @@ namespace
     // map(0xff8800, 0xff8800).rw(m_ymsnd, FUNC(ay8910_device::data_r), FUNC(ay8910_device::address_w));
     // map(0xff8802, 0xff8802).w(m_ymsnd, FUNC(ay8910_device::data_w));
 
+    // example from src/mame/bandai/sv8000.cpp
+    map(0xdf10, 0xdf10).w(m_ymsnd, FUNC(ay8910_device::data_w));
+    map(0xdf11, 0xdf11).w(m_ymsnd, FUNC(ay8910_device::address_w));
+    // map(0xc0, 0xc0).w("ay8910", FUNC(ay8910_device::data_w));
+    // map(0xc1, 0xc1).w("ay8910", FUNC(ay8910_device::address_w));
 
     // controllers
     // DF00-DF03: Controller 1 through 4 inputs (aliased to DF04-DF07)
     // When Controller Select Pin output (P51, pin 4, J4-P5x connector) is 1: [C B C B Right Left Down Up]
     // When Controller Select Pin output (P51, pin 4, J4-P5x connector) is 0: [Start A Start A 0 0 Down Up]
-
   }
 
   INPUT_PORTS_START(gtvip_inputs)
@@ -118,11 +124,10 @@ namespace
   ROM_LOAD("textdemo.bin", 0x8000, 0x8000, CRC(4cf363dc) SHA1(bed707ec2ebb3e6cddfc6db58d78e436af05961a))
 
   // sound test
-  // ROM_LOAD("soundtest.bin", 0x8000, 0x8000, CRC(f642b60b) SHA1(959e39441e56fb1d2a6e6534197f14c4afdbda0f))
+  // ROM_LOAD("soundtest.bin", 0x8000, 0x8000, CRC(7a828be3) SHA1(3b6487dbec7407e628b900877aae976f706a4d51))
 
   // monitor rom test
   // ROM_LOAD("monitor.bin", 0xE000, 0x2000, CRC(9575d641) SHA1(56ca218c0ed3d8fd631ee03690c0815b1441d0d4))
-    
 
   ROM_END
 
